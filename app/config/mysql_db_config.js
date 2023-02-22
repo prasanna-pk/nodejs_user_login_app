@@ -1,5 +1,5 @@
 module.exports = {
-    host: "localhost",
-    user: "root",
-    password: "2828"
+    host: process.env.HOST,
+    user: process.env.USER,
+    password: process.env.PASSWORD
 }
