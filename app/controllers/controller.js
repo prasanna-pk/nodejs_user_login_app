@@ -1,11 +1,20 @@
+/*
+Controller module for the application
+Imported modules
+bcrypt - used here to encrypt the password
+jsonwebtoken - to generate bearer token
+*/
+
+
 const User = require("../models/models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 exports.create = async (req, res) => {
-    if (!req.body) {
+    if (!req.body || !req.body.hasOwnProperty('email') || !req.body.hasOwnProperty('name') || !req.body.hasOwnProperty('Password')) {
         res.status(400).send({
-            message: "Empty body"
+            success: false,
+            message: "Missing required fields"
         });
     }
 
@@ -24,6 +33,7 @@ exports.create = async (req, res) => {
     User.create(user_data, (err, data) => {
         if (err) {
             res.status(500).send({
+                success: false,
                 message: err.message || "error"
             })
         }
@@ -32,9 +42,10 @@ exports.create = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-    if (!req.body) {
+    if (!req.body || !req.body.hasOwnProperty('email') || !req.body.hasOwnProperty('Password')) {
         res.status(400).send({
-            message: "Empty body"
+            success: false,
+            message: "Missing required fields"
         });
     }
 
@@ -45,11 +56,13 @@ exports.login = async (req, res) => {
         if (err) {
             if (err.kind === "not_found") {
                 res.status(404).send({
-                    message: `Not found Customer with email ${email_id}.`
+                    success: false,
+                    message: `User not found with email ${email_id}.`
                 });
             } else {
                 res.status(500).send({
-                    message: "Error retrieving Customer with email " + email_id
+                    success: false,
+                    message: "Error retrieving user with email " + email_id
                 });
             }
         } else {
@@ -67,7 +80,8 @@ exports.login = async (req, res) => {
             }
             else {
                 res.status(500).send({
-                    success: false
+                    success: false,
+                    message: "Incorrect email id or password"
                 });
             }
         }
@@ -75,26 +89,54 @@ exports.login = async (req, res) => {
 };
 
 exports.get_users = (req, res) => {
+
+    if (!req.query || !req.query.hasOwnProperty('name')) {
+        res.status(400).send({
+            success: false,
+            message: "Missing the required query parameter: name"
+        });
+    }
+
     var name = req.query.name;
 
     User.get_users(name, (err, data) => {
         if (err) {
             if (err.message === "not_found") {
                 res.status(404).send({
+                    success: false,
                     message: `No users found with name ${name}.`
                 });
             } else {
                 res.status(500).send({
-                    message: "Error retrieving users with name " + name
+                    success: false,
+                    message: "Error retrieving users with name: " + name
                 });
             }
         } else {
-            res.send(data);
+            res.send({
+                success: true,
+                users: data
+            });
         }
     });
 }
 
 exports.update_user = (req, res) => {
+
+    if (!req.body || !req.body.hasOwnProperty('email') || !req.body.hasOwnProperty('name') || !req.body.hasOwnProperty('Phone_number')) {
+        res.status(400).send({
+            success: false,
+            message: "Missing required fields"
+        });
+    }
+
+    if (!req.params || !req.params.hasOwnProperty('id')) {
+        res.status(400).send({
+            success: false,
+            message: "Missing user id path parameter"
+        });
+    }
+
     var payload = {
         userdata: {
             email: req.body.email,
@@ -107,12 +149,14 @@ exports.update_user = (req, res) => {
 
     User.update_user(payload, (err, data) => {
         if (err) {
-                res.status(500).send({
-                    success: false
-                });
+            res.status(500).send({
+                success: false,
+                message: "User update failed"
+            });
         } else {
             res.send({
-                success: true
+                success: true,
+                user: payload.userdata
             });
         }
     });

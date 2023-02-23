@@ -1,3 +1,6 @@
+/*
+mysql module used to access the mysql database 
+ */
 const mysql = require('mysql');
 const mysql_config = require('../config/mysql_db_config');
 

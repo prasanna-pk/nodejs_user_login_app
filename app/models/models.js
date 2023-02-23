@@ -1,3 +1,7 @@
+/*
+Models module for the application - to access the database and perform read/write operations.
+*/
+
 const db = require('./db');
 
 // constructor
@@ -38,7 +42,7 @@ User.login = (user_id, result) => {
 }
 
 User.get_users = (search_name, result) => {
-  db.query(`SELECT Name,Email,Phone_number,USER_CREATED_DATE,USER_UPDATED_DATE FROM Test_DB.UserTable where Name REGEXP "${search_name}"`, (err, res) => {
+  db.query(`SELECT ID,Name,Email,Phone_number,USER_CREATED_DATE,USER_UPDATED_DATE FROM Test_DB.UserTable where Name REGEXP "${search_name}"`, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);
@@ -50,7 +54,7 @@ User.get_users = (search_name, result) => {
       return;
     }
 
-    // not found Customer with the id
+    // not found user with the id
     result({ message: "not_found" }, null);
   })
 }
