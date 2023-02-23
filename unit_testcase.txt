@@ -1,0 +1,15 @@
+Unit testing test cases:
+
+Signup api should insert entry into the database 
+input validation done for signup api
+API should fail if request body does not have the required fields
+
+Login api should validate email id and password
+Login api should be success only if password is matching
+Bearer token should have expiry of 60 minutes
+
+Getuser api should perform regex match and return users data in an array
+input validation should be done to check the query parameter
+
+update api should check for any one of the fields(email, name, phone number) in request body and update
+update api should fail if there are no mentioned fields in request body
